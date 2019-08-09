@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "BlenderAddonInstaller settings schema",
+    "type": "object",
+    "properties": {
+        "blender": {
+            "description": "Blender application related settings",
+            "type": "object",
+            "properties": {
+                "install_dir": {
+                    "type": "string",
+                    "description": "Blender application installation directory"
+                }
+            }
+        },
+        "download_paths": {
+            "type": "array",
+            "description": "Search paths for downloaded addons"
+        }
+    },
+    "required": ["blender", "download_paths"]
+}

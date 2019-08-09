@@ -1,0 +1,5 @@
+blender:
+  install_dir: C:\Program Files\Blender Foundation\Blender
+
+download_paths:
+  - C:\Users\Chris\Downloads
