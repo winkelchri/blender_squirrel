@@ -29,12 +29,12 @@ def plugin_backup_path():
 
 @pytest.fixture
 def single_file_plugin():
-    return Path('./tests/test_files/single_plugin.zip')
+    return Path('./tests/test_files/empty_single_plugin.zip')
 
 
 @pytest.fixture
 def folder_plugin():
-    return Path('./tests/test_files/folder_plugin.zip')
+    return Path('./tests/test_files/empty_folder_plugin.zip')
 
 
 def test_install_singlefile_plugin(

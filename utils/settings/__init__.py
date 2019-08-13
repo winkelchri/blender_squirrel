@@ -90,16 +90,44 @@ class AddonInstallerSettings():
     def find_downloaded_plugins(
         self,
         additional_download_paths=[],
-        plugin_extensions=['.py', '.zip']
+        plugin_extensions=['.py', '.zip'],
+        ignore_settings=False
     ):
         ''' Finds all downloaded packages within all provided download paths.
+
+            Args:
+                additional_download_paths (list): List of paths to search for
+                    blender addons additionally.
+                plugin_extensions (list): default ['.py', '.zip'] list of
+                    extensions to check for possible Blender plugins.
+                ignore_settings (bool): Switch if the settings "download_paths"
+                    should be ignored. Usefull in case of testing or over-
+                    writing behaviour using the `additional_download_paths`.
+            Returns:
+                list (pathlib.Path): List of path's of found blender plugins.
         '''
+
         all_plugin_files = []
 
-        logger.debug(f'Searching in: {self.settings["download_paths"]}')
-        logger.debug(f'And: {additional_download_paths}')
+        if not isinstance(additional_download_paths, list):
+            raise ValueError((
+                f"additional_download_paths has to be type of <list>, "
+                f"not {type(additional_download_paths)}"
+            ))
 
-        download_paths = self.settings['download_paths'] + additional_download_paths
+        download_paths = self.settings['download_paths'] + \
+            additional_download_paths
+
+        if ignore_settings:
+            logger.debug((
+                f"Ignore settings = True. "
+                f"Skipping: {self.settings['download_paths']}."
+            ))
+
+            download_paths = additional_download_paths
+
+        logger.debug(f"Searching for plugins in: {download_paths}")
+
         for download_path in download_paths:
             download_path = Path(download_path)
 

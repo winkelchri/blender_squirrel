@@ -7,7 +7,7 @@ from .validators import YAMLSettingsValidator
 
 class YAMLSettings():
     common_directories = (
-        Path('.')
+        Path('.'),
     )
     settings_filename = 'settings.yaml'
 

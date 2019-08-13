@@ -8,9 +8,18 @@ from loguru import logger
 
 
 class ZipPlugin():
+    # TODO: Maybe something more generic required? Single python files
+    #       could also be a blender plugin.
+
     def __init__(self, plugin_filename, settings):
-        self.plugin_filename = Path(plugin_filename)
+        self.__plugin_filename = Path(plugin_filename)
         self.settings = settings
+
+        self.__zip_object = None
+
+    @property
+    def plugin_filename(self):
+        return self.__plugin_filename
 
     def unzip(self, plugin):
         ''' Extracts the plugin into a temp folder. '''

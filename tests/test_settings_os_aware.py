@@ -3,7 +3,6 @@ import pytest
 from pathlib import Path
 
 from utils.settings import AddonInstallerSettings
-from utils.plugins import ZipPlugin
 
 
 @pytest.fixture
@@ -13,11 +12,21 @@ def settings():
 
 @pytest.fixture
 def downloaded_plugins_path():
-    return Path('./tests/test_files')
+    return [Path('./tests/test_files'), ]
 
 
-def test_find_downloaded_plugins(settings, downloaded_plugins_path):
-    downloaded_plugins = settings.find_downloaded_plugins(
-        additional_download_paths=downloaded_plugins_path
+@pytest.fixture
+def found_download_test_plugins(settings, downloaded_plugins_path):
+    return settings.find_downloaded_plugins(
+        additional_download_paths=downloaded_plugins_path,
+        ignore_settings=True
     )
-    assert len(downloaded_plugins) == 2
+
+
+@pytest.fixture
+def validator():
+    return BlenderPluginValidator()
+
+
+def test_find_downloaded_plugins(found_download_test_plugins):
+    assert len(found_download_test_plugins) == 4
