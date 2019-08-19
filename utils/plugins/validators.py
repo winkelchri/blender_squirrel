@@ -60,7 +60,7 @@ class BlenderPluginValidator():
 
         # Multiple files/folders found in zipfile_object
         elif len(infolist) > 1:
-            logger.info(f"Found multiple files in {filename}: {infolist}")
+            logger.info(f"Found multiple files in {filename}: {len(infolist)}")
 
             # Validate all __init__.py files. There could be multiple ones.
             init_files = [

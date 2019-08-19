@@ -3,7 +3,7 @@ import shutil
 import zipfile
 
 from pathlib import Path
-
+from .validators import BlenderPluginValidator
 from loguru import logger
 
 
@@ -34,6 +34,8 @@ class ZipPlugin():
 
     def install(self):
         ''' Unpacks a zip plugin. '''
+
+        self.validate()
 
         logger.info(f'Starting installation of {self.plugin_filename}')
         tmp_folder = self.unzip(self.plugin_filename)
@@ -98,8 +100,14 @@ class ZipPlugin():
                 plugin_backup_path = backup_path / plugin.name
 
                 logger.info((
-                    f"Found {plugin.name} in installed plugins.\n"
+                    f"Found {plugin.name} in installed plugins. "
                     f"Copy {installed_plugin} -> {plugin_backup_path}"
                 ))
 
                 shutil.move(installed_plugin, plugin_backup_path)
+
+    def validate(self):
+        ''' Checks if the current plugin is valid. '''
+
+        validator = BlenderPluginValidator()
+        validator.validate(self.plugin_filename)
