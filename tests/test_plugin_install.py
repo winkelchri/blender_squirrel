@@ -29,12 +29,12 @@ def plugin_backup_path():
 
 @pytest.fixture
 def single_file_plugin():
-    return Path('./tests/test_files/empty_single_plugin.zip')
+    return Path('./tests/test_files/valid_single_plugin.zip')
 
 
 @pytest.fixture
 def folder_plugin():
-    return Path('./tests/test_files/empty_folder_plugin.zip')
+    return Path('./tests/test_files/valid_folder_plugin.zip')
 
 
 def test_install_singlefile_plugin(
@@ -50,7 +50,7 @@ def test_install_singlefile_plugin(
     plugin.install()
 
     # The plugin file has to exist within the plugin path
-    assert Path(test_plugin_path, 'single_plugin.py').exists()
+    assert Path(test_plugin_path, 'valid_plugin.py').exists()
 
 
 def test_install_folder_plugin(
@@ -66,12 +66,12 @@ def test_install_folder_plugin(
     plugin.install()
 
     # Plugin root folder must exist
-    assert Path(test_plugin_path, 'plugin_folder').exists()
+    assert Path(test_plugin_path, 'valid_folder_plugin').exists()
 
-    assert Path(test_plugin_path, 'plugin_folder', '__init__.py').exists()
+    assert Path(test_plugin_path, 'valid_folder_plugin', '__init__.py').exists()
 
-    assert Path(test_plugin_path, 'plugin_folder', 'folder1').exists()
-    assert Path(test_plugin_path, 'plugin_folder', 'folder1', 'test_file.py').exists()
+    assert Path(test_plugin_path, 'valid_folder_plugin', 'folder1').exists()
+    assert Path(test_plugin_path, 'valid_folder_plugin', 'folder1', 'test_file.py').exists()
 
 
 def test_multiple_plugin_install(
