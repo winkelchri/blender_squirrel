@@ -104,7 +104,8 @@ class ZipPlugin():
                     f"Copy {installed_plugin} -> {plugin_backup_path}"
                 ))
 
-                shutil.move(installed_plugin, plugin_backup_path)
+                shutil.move(installed_plugin.as_posix(),
+                            plugin_backup_path.as_posix())
 
     def validate(self):
         ''' Checks if the current plugin is valid. '''

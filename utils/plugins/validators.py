@@ -70,24 +70,24 @@ class BlenderPluginValidator():
             logger.info(f"Found multiple files in {filename}: {len(infolist)}")
 
             # Validate all __init__.py files. There could be multiple ones.
-            init_files = [
+            python_files = [
                 file.filename
                 for file in infolist
-                if '__init__.py' in file.filename
+                if '.py' in file.filename
             ]
 
-            no_init_was_valid = True
+            no_python_file_was_valid = True
 
-            for file in init_files:
+            for file in python_files:
                 try:
                     self.__validate_zip_python(file, zipfile_object)
-                    no_init_was_valid = False
+                    no_python_file_was_valid = False
                 except InvalidBlenderPlugin:
                     pass
 
-            if no_init_was_valid:
+            if no_python_file_was_valid:
                 raise InvalidBlenderPlugin(
-                    f'No valid __init__.py found in: {init_files}'
+                    f'No valid python file found in: {python_files}'
                 )
 
     def __validate_zip_python(self, filename, zipfile_object):
@@ -125,7 +125,6 @@ class BlenderPluginValidator():
             zipinfo.filename
             for zipinfo in infolist
         ]
-        print(filename_list)
 
         for filename in filename_list:
             if addons_path_stub_in_blender_zip in filename:
