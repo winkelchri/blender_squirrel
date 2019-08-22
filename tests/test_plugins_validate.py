@@ -14,6 +14,7 @@ def validator():
 
 valid_plugins = [
     './tests/test_files/plugin_valid_single',
+    './tests/test_files/plugin_valid_single_with_assets',
     './tests/test_files/plugin_valid_folder',
 ]
 
