@@ -15,9 +15,12 @@ def cli():
 
 
 @cli.command()
-def install():
+@click.option('--cleanup', is_flag=True, help="Removes the installed file from the source directory")
+def install(cleanup):
     settings = AddonInstallerSettings()
     plugins_paths = settings.find_downloaded_plugins()
+    skipped_files = []
+    cleaned_files = []
 
     for plugin_path in plugins_paths:
         plugin = ZipPlugin(
@@ -26,8 +29,20 @@ def install():
         )
         try:
             plugin.install()
-        except InvalidBlenderPlugin as e:
-            click.echo(f"Skipping {plugin_path} - invalid blender plugin")
+            if cleanup is True:
+                cleaned_files.append(plugin_path)
+                plugin_path.unlink()
+        except InvalidBlenderPlugin:
+            skipped_files.append(plugin_path)
+
+    click.echo(f"Skipped: ")
+    for file in skipped_files:
+        click.echo(f"- {file}")
+
+    if cleanup is True:
+        click.echo(f"Cleaned: ")
+        for file in cleaned_files:
+            click.echo(f"- {file}")
 
 
 if __name__ == "__main__":
