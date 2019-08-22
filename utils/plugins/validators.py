@@ -47,6 +47,13 @@ class BlenderPluginValidator():
         zipfile_object = zipfile.ZipFile(filename)
         infolist = zipfile_object.infolist()
 
+        if not self.__is_not_a_blender_zip_archive(infolist):
+            raise InvalidBlenderPlugin(
+                f"{filename} is a blender application zip file."
+            )
+        else:
+            logger.debug(f'{filename} is not a blender application zip file.')
+
         # Only one file found in zipfile_object
         if len(infolist) == 1:
             zipinfo_object = infolist[0]
@@ -96,5 +103,35 @@ class BlenderPluginValidator():
                 ))
         logger.info(f"{zipfile_object.filename}/{filename} is valid.")
         return True
+
+    def __is_not_a_blender_zip_archive(self, infolist):
+        ''' Returns True if the given file is not a blender.org
+            application zip file (which contains plenty of valid plugins)
+            which we most likely not want to install into the addons
+            directory.
+
+            Args:
+                infolist (ZipFile().infolist): Info listing of all contained
+                    files within this zip file.
+
+            Returns: (bool) True if the plugin is not a blender application.
+        '''
+
+        # Search pattern for a folder only existing in blender application zip
+        # files.
+        addons_path_stub_in_blender_zip = "scripts/addons"
+
+        filename_list = [
+            zipinfo.filename
+            for zipinfo in infolist
+        ]
+        print(filename_list)
+
+        for filename in filename_list:
+            if addons_path_stub_in_blender_zip in filename:
+                return False
+
+        return True
+
 
 

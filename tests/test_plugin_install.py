@@ -6,6 +6,8 @@ from pathlib import Path
 from utils.settings import AddonInstallerSettings
 from utils.plugins import ZipPlugin
 
+from fixtures import zip_file
+
 
 @pytest.fixture
 def settings():
