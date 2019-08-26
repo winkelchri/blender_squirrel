@@ -2,11 +2,11 @@ from loguru import logger
 import zipfile
 
 
-class InvalidBlenderPlugin(Exception):
+class InvalidBlenderAddon(Exception):
     pass
 
 
-class BlenderPluginValidator():
+class BlenderAddonValidator():
     def __zipinfo_is_python(self, zipinfo_object):
         ''' Returns True, if the given zipinfo object is a python file. '''
 
@@ -23,14 +23,14 @@ class BlenderPluginValidator():
         return False
 
     def validate(self, filename):
-        ''' Validates the given plugin_object.
+        ''' Validates the given addon_object.
 
             Args:
                 filename (pathlib.Path): A file to check if it is a valid
-                    blender plugin.
+                    blender addon.
 
             Raises:
-                InvalidBlenderPlugin
+                InvalidBlenderAddon
         '''
 
         logger.info(f"Validating {filename}")
@@ -39,16 +39,16 @@ class BlenderPluginValidator():
             logger.debug(f"{filename} is a zip-file")
             self.__validate_zip_file(filename)
         else:
-            raise InvalidBlenderPlugin(f'{filename} has an invalid file format.')
+            raise InvalidBlenderAddon(f'{filename} has an invalid file format.')
 
     def __validate_zip_file(self, filename):
-        ''' Validates a blender plugin zip file. '''
+        ''' Validates a blender addon zip file. '''
 
         zipfile_object = zipfile.ZipFile(filename)
         infolist = zipfile_object.infolist()
 
         if not self.__is_not_a_blender_zip_archive(infolist):
-            raise InvalidBlenderPlugin(
+            raise InvalidBlenderAddon(
                 f"{filename} is a blender application zip file."
             )
         else:
@@ -82,23 +82,23 @@ class BlenderPluginValidator():
                 try:
                     self.__validate_zip_python(file, zipfile_object)
                     no_python_file_was_valid = False
-                except InvalidBlenderPlugin:
+                except InvalidBlenderAddon:
                     pass
 
             if no_python_file_was_valid:
-                raise InvalidBlenderPlugin(
+                raise InvalidBlenderAddon(
                     f'No valid python file found in: {python_files}'
                 )
 
     def __validate_zip_python(self, filename, zipfile_object):
-        ''' Validates a blender plugin python file.
+        ''' Validates a blender addon python file.
         '''
 
         with zipfile_object.open(filename, 'r') as fp:
             file_data = fp.read()
 
             if b'bl_info' not in file_data:
-                raise InvalidBlenderPlugin((
+                raise InvalidBlenderAddon((
                     f"Missing 'bl_info' section within file {filename}"
                 ))
         logger.info(f"{zipfile_object.filename}/{filename} is valid.")
@@ -106,7 +106,7 @@ class BlenderPluginValidator():
 
     def __is_not_a_blender_zip_archive(self, infolist):
         ''' Returns True if the given file is not a blender.org
-            application zip file (which contains plenty of valid plugins)
+            application zip file (which contains plenty of valid addons)
             which we most likely not want to install into the addons
             directory.
 
@@ -114,7 +114,7 @@ class BlenderPluginValidator():
                 infolist (ZipFile().infolist): Info listing of all contained
                     files within this zip file.
 
-            Returns: (bool) True if the plugin is not a blender application.
+            Returns: (bool) True if the addon is not a blender application.
         '''
 
         # Search pattern for a folder only existing in blender application zip

@@ -5,9 +5,9 @@
 ```Python
 from utils.settings import BlenderAddonSettings
 
-downloaded_plugins = BlenderAddonSettings.find_downloaded_plugins()
+downloaded_addons = BlenderAddonSettings.find_downloaded_addons()
 
-for downloaded_plugin in downloaded_plugins:
-    downloaded_plugin.install()
+for downloaded_addon in downloaded_addons:
+    downloaded_addon.install()
 
 ```
