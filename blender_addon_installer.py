@@ -34,6 +34,10 @@ def install(cleanup):
                 plugin_path.unlink()
         except InvalidBlenderPlugin:
             skipped_files.append(plugin_path)
+        except NotImplementedError:
+            click.echo(
+                f"Currently unsupported blender addon format: {plugin_path}")
+            skipped_files.append(plugin_path)
 
     click.echo(f"Skipped: ")
     for file in skipped_files:

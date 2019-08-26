@@ -16,6 +16,11 @@ class ZipPlugin():
         self.settings = settings
 
         self.__zip_object = None
+        self.__plugin_path = None
+
+    @property
+    def plugin_path(self):
+        return self.__plugin_path
 
     @property
     def plugin_filename(self):
@@ -74,6 +79,8 @@ class ZipPlugin():
         plugin_install_path = self.settings.plugin_path / plugin.name
         logger.info(f"Move {plugin} to {plugin_install_path}.")
         shutil.move(plugin, plugin_install_path)
+
+        self.__plugin_path = Path(plugin_install_path, plugin)
 
     def backup(self, plugin):
         ''' Gets the source plugin path object and backups

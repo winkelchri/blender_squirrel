@@ -1,12 +1,13 @@
 import pytest
 import shutil
+import zipfile
 
 from pathlib import Path
 
 from utils.settings import AddonInstallerSettings
 from utils.plugins import ZipPlugin
 
-from fixtures import zip_file
+from fixtures import zip_file, valid_plugins, invalid_plugins
 
 
 @pytest.fixture
@@ -29,67 +30,86 @@ def plugin_backup_path():
     shutil.rmtree(path, ignore_errors=True)
 
 
-@pytest.fixture
-def single_file_plugin():
-    return Path('./tests/test_files/valid_single_plugin.zip')
+# @pytest.fixture
+# def single_file_plugin():
+#     return Path('./tests/test_files/valid_single_plugin.zip')
 
 
-@pytest.fixture
-def folder_plugin():
-    return Path('./tests/test_files/valid_folder_plugin.zip')
+# @pytest.fixture
+# def folder_plugin():
+#     return Path('./tests/test_files/valid_folder_plugin.zip')
 
 
-def test_install_singlefile_plugin(
+def validate_plugin_content(plugin, target_directory):
+    with zipfile.ZipFile(plugin.plugin_filename) as current_zipfile:
+        filenames = [
+            zipinfo_obj.filename
+            for zipinfo_obj in current_zipfile.infolist()
+        ]
+
+        for filename in filenames:
+            print(filename)
+            print(Path(plugin.plugin_path))
+            # if Path(plugin.plugin_path).is_dir():
+            #     assert Path(target_directory, filename).exists()
+            # else:
+            #     assert Path(plugin.plugin_path, filename).exists()
+
+
+@pytest.mark.parametrize('file_or_folder', valid_plugins)
+def test_install_valid_plugins(
     settings,
-    single_file_plugin,
+    zip_file,
     test_plugin_path,
-    plugin_backup_path
+    plugin_backup_path,
 ):
 
     settings.plugin_path = test_plugin_path
     settings.backup_path = plugin_backup_path
-    plugin = ZipPlugin(plugin_filename=single_file_plugin, settings=settings)
+    plugin = ZipPlugin(plugin_filename=zip_file, settings=settings)
     plugin.install()
+
+    validate_plugin_content(plugin, test_plugin_path)
 
     # The plugin file has to exist within the plugin path
-    assert Path(test_plugin_path, 'valid_plugin.py').exists()
+    # assert Path(test_plugin_path, 'valid_plugin.py').exists()
 
 
-def test_install_folder_plugin(
-    settings,
-    folder_plugin,
-    test_plugin_path,
-    plugin_backup_path
-):
+# def test_install_folder_plugin(
+#     settings,
+#     folder_plugin,
+#     test_plugin_path,
+#     plugin_backup_path
+# ):
 
-    settings.plugin_path = test_plugin_path
-    settings.backup_path = plugin_backup_path
-    plugin = ZipPlugin(plugin_filename=folder_plugin, settings=settings)
-    plugin.install()
+#     settings.plugin_path = test_plugin_path
+#     settings.backup_path = plugin_backup_path
+#     plugin = ZipPlugin(plugin_filename=folder_plugin, settings=settings)
+#     plugin.install()
 
-    # Plugin root folder must exist
-    assert Path(test_plugin_path, 'valid_folder_plugin').exists()
+#     # Plugin root folder must exist
+#     assert Path(test_plugin_path, 'valid_folder_plugin').exists()
 
-    assert Path(test_plugin_path, 'valid_folder_plugin', '__init__.py').exists()
+#     assert Path(test_plugin_path, 'valid_folder_plugin', '__init__.py').exists()
 
-    assert Path(test_plugin_path, 'valid_folder_plugin', 'folder1').exists()
-    assert Path(test_plugin_path, 'valid_folder_plugin', 'folder1', 'test_file.py').exists()
+#     assert Path(test_plugin_path, 'valid_folder_plugin', 'folder1').exists()
+#     assert Path(test_plugin_path, 'valid_folder_plugin', 'folder1', 'test_file.py').exists()
 
 
-def test_multiple_plugin_install(
-    settings,
-    folder_plugin,
-    single_file_plugin,
-    test_plugin_path,
-    plugin_backup_path
-):
-    for i in range(2):
-        test_install_singlefile_plugin(settings,
-                                       single_file_plugin,
-                                       test_plugin_path,
-                                       plugin_backup_path)
-    for i in range(2):
-        test_install_folder_plugin(settings,
-                                   folder_plugin,
-                                   test_plugin_path,
-                                   plugin_backup_path)
+# def test_multiple_plugin_install(
+#     settings,
+#     folder_plugin,
+#     single_file_plugin,
+#     test_plugin_path,
+#     plugin_backup_path
+# ):
+#     for i in range(2):
+#         test_install_singlefile_plugin(settings,
+#                                        single_file_plugin,
+#                                        test_plugin_path,
+#                                        plugin_backup_path)
+#     for i in range(2):
+#         test_install_folder_plugin(settings,
+#                                    folder_plugin,
+#                                    test_plugin_path,
+#                                    plugin_backup_path)
