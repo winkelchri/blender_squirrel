@@ -10,6 +10,10 @@ click = "^7.0"
 pyyaml = "^5.1"
 loguru = "^0.3.2"
 jsonschema = "^3.0"
+browser_cookie3 = "^0.7.6"
+requests = "^2.22"
+beautifulsoup4 = "^4.8"
+requests-html = "^0.10.0"
 
 [tool.poetry.dev-dependencies]
 pep8 = "^1.7"
