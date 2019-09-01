@@ -14,10 +14,10 @@ BACKUP_SUFFIX = datetime.datetime.now().strftime("%Y.%m.%d_%H%M%S")
 LOG_LEVEL = 'DEBUG'
 
 
-def install_zip_plugin(plugin):
+def install_zip_addon(addon):
 
 
-def backup_plugin(plugin):
+def backup_addon(addon):
 
 def main():
     ''' Main function. '''
@@ -26,10 +26,10 @@ def main():
     global LOG
     LOG = setup_logging(level=LOG_LEVEL)
 
-    # Ensure valid blender plugin path
+    # Ensure valid blender addon path
     if not BLENDER_PLUGIN_PATH.is_dir():
         raise FileNotFoundError(
-            "The given blender plugin path is invalid: {}".format(
+            "The given blender addon path is invalid: {}".format(
                 BLENDER_PLUGIN_PATH
             )
         )
@@ -37,18 +37,18 @@ def main():
     # Path object of install script
     me = Path(__file__)
 
-    # Iterate over plugins in current path
-    for plugin in Path('.').iterdir():
+    # Iterate over addons in current path
+    for addon in Path('.').iterdir():
         try:
-            if plugin.name == me.name:
+            if addon.name == me.name:
                 LOG.info("Skip handling myself.")
                 continue
 
-            if 'py' in plugin.suffix or 'zip' in plugin.suffix:
-                prepare_plugin(plugin)
-                remove_plugin(plugin)
+            if 'py' in addon.suffix or 'zip' in addon.suffix:
+                prepare_addon(addon)
+                remove_addon(addon)
         except:
-            LOG.exception(f"Error in handling plugin: {plugin.name}")
+            LOG.exception(f"Error in handling addon: {addon.name}")
 
     cleanup_tmp_folder()
 

@@ -6,7 +6,7 @@ import pathlib
 
 @pytest.fixture
 def file_or_folder():
-    return "./tests/test_files/plugin_valid_single"
+    return "./tests/test_files/addon_valid_single"
 
 
 @pytest.fixture
@@ -38,15 +38,15 @@ def zip_file(file_or_folder):
         # Everything will be deleted now ...
 
 
-valid_plugins = [
-    './tests/test_files/plugin_valid_single',
-    './tests/test_files/plugin_valid_single_with_assets',
-    './tests/test_files/plugin_valid_folder',
+valid_addons = [
+    './tests/test_files/addon_valid_single',
+    './tests/test_files/addon_valid_single_with_assets',
+    './tests/test_files/addon_valid_folder',
 ]
 
 
-invalid_plugins = [
-    './tests/test_files/plugin_empty_single',
-    './tests/test_files/plugin_empty_folder',
+invalid_addons = [
+    './tests/test_files/addon_empty_single',
+    './tests/test_files/addon_empty_folder',
     './tests/test_files/blender-2.80-test'
 ]

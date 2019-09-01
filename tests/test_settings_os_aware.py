@@ -14,17 +14,17 @@ def settings():
 
 
 @pytest.fixture
-def downloaded_plugins_path():
+def downloaded_addons_path():
     return [Path('./tests/test_files'), ]
 
 
 @pytest.fixture
-def found_download_test_plugins(settings, downloaded_plugins_path):
-    return settings.find_downloaded_plugins(
-        additional_download_paths=downloaded_plugins_path,
+def found_download_test_addons(settings, downloaded_addons_path):
+    return settings.find_downloaded_addons(
+        additional_download_paths=downloaded_addons_path,
         ignore_settings=True
     )
 
 
-def test_find_downloaded_plugins(found_download_test_plugins):
-    assert len(found_download_test_plugins) == 4
+def test_find_downloaded_addons(found_download_test_addons):
+    assert len(found_download_test_addons) == 4

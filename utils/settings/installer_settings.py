@@ -17,7 +17,7 @@ class AddonInstallerSettings():
         self.blender_version = blender_version
         self.__settings = None
         self.__temp_dir = None
-        self.__plugin_path = None
+        self.__addon_path = None
         self.__backup_path = None
 
     @property
@@ -31,15 +31,15 @@ class AddonInstallerSettings():
         return self.__settings
 
     @property
-    def plugin_path(self):
-        if self.__plugin_path is None:
+    def addon_path(self):
+        if self.__addon_path is None:
             if self.blender_version != "2.80":
                 raise NotImplementedError(
                     'Currently, only Blender version 2.80 is supported')
 
             # Handle windows paths
             if self.system == "Windows":
-                plugin_path = self.__windows_plugin_path(self.blender_version)
+                addon_path = self.__windows_addon_path(self.blender_version)
 
             # Raise error on unsupported platforms
             else:
@@ -47,23 +47,23 @@ class AddonInstallerSettings():
                     f'Your system: {self.system} is currently not supported.'
                 )
 
-            # Create the plugin directory if not existing
-            if not plugin_path.exists():
-                plugin_path.mkdir(parents=True)
+            # Create the addon directory if not existing
+            if not addon_path.exists():
+                addon_path.mkdir(parents=True)
 
-            self.__plugin_path = plugin_path
+            self.__addon_path = addon_path
 
-        return self.__plugin_path
+        return self.__addon_path
 
-    @plugin_path.setter
-    def plugin_path(self, value):
+    @addon_path.setter
+    def addon_path(self, value):
         if Path(value).exists() is False:
-            raise ValueError(f'Plugin path {value} does not exist')
+            raise ValueError(f'Addon path {value} does not exist')
 
-        self.__plugin_path = value
+        self.__addon_path = value
 
-    def __windows_plugin_path(self, blender_version):
-        ''' Returns the blender plugins path for windows '''
+    def __windows_addon_path(self, blender_version):
+        ''' Returns the blender addons path for windows '''
 
         base_path = os.environ.get('APPDATA', None)
 
@@ -87,10 +87,10 @@ class AddonInstallerSettings():
         self.__temp_dir = Path(tempfile.mkdtemp())
         return self.__temp_dir
 
-    def find_downloaded_plugins(
+    def find_downloaded_addons(
         self,
         additional_download_paths=[],
-        plugin_extensions=['.py', '.zip'],
+        addon_extensions=['.py', '.zip'],
         ignore_settings=False
     ):
         ''' Finds all downloaded packages within all provided download paths.
@@ -98,16 +98,16 @@ class AddonInstallerSettings():
             Args:
                 additional_download_paths (list): List of paths to search for
                     blender addons additionally.
-                plugin_extensions (list): default ['.py', '.zip'] list of
-                    extensions to check for possible Blender plugins.
+                addon_extensions (list): default ['.py', '.zip'] list of
+                    extensions to check for possible Blender addons.
                 ignore_settings (bool): Switch if the settings "download_paths"
                     should be ignored. Usefull in case of testing or over-
                     writing behaviour using the `additional_download_paths`.
             Returns:
-                list (pathlib.Path): List of path's of found blender plugins.
+                list (pathlib.Path): List of path's of found blender addons.
         '''
 
-        all_plugin_files = []
+        all_addon_files = []
 
         if not isinstance(additional_download_paths, list):
             raise ValueError((
@@ -126,27 +126,27 @@ class AddonInstallerSettings():
 
             download_paths = additional_download_paths
 
-        logger.debug(f"Searching for plugins in: {download_paths}")
+        logger.debug(f"Searching for addons in: {download_paths}")
 
         for download_path in download_paths:
             download_path = Path(download_path)
 
-            # Filter out all files with valid plugin extensions
-            plugin_files = [
-                plugin_file
-                for plugin_file in download_path.iterdir()
-                if plugin_file.suffix in plugin_extensions
+            # Filter out all files with valid addon extensions
+            addon_files = [
+                addon_file
+                for addon_file in download_path.iterdir()
+                if addon_file.suffix in addon_extensions
             ]
-            all_plugin_files += plugin_files
-        return all_plugin_files
+            all_addon_files += addon_files
+        return all_addon_files
 
     @property
     def backup_path(self, base_folder=None):
-        ''' Returns the backup path for installed plugins. '''
+        ''' Returns the backup path for installed addons. '''
 
         if self.__backup_path is None:
             if base_folder is None:
-                base_folder = self.plugin_path
+                base_folder = self.addon_path
 
                 datetime_suffix = datetime.datetime.now().strftime("%Y.%m.%d_%H%M%S")
 

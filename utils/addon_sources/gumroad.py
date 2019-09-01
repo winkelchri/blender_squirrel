@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 
 
 class GumroadProducts():
-    ''' Manager class for handling gumroad plugins. '''
+    ''' Manager class for handling gumroad addons. '''
 
     def __init__(self, url='https://gumroad.com/library'):
         self.url = url
