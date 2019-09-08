@@ -21,7 +21,7 @@ def install(cleanup):
     cleaned_files = []
 
     for addon_path in addons_paths:
-        addon = ZipA(
+        addon = ZipAddon(
             settings=settings,
             addon_filename=addon_path
         )
