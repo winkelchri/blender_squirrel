@@ -39,7 +39,8 @@ class BlenderAddonValidator():
             logger.debug(f"{filename} is a zip-file")
             self.__validate_zip_file(filename)
         else:
-            raise InvalidBlenderAddon(f'{filename} has an invalid file format.')
+            raise InvalidBlenderAddon(
+                f'{filename} has an invalid file format.')
 
     def __validate_zip_file(self, filename):
         ''' Validates a blender addon zip file. '''
@@ -131,6 +132,3 @@ class BlenderAddonValidator():
                 return False
 
         return True
-
-
-

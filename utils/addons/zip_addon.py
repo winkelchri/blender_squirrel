@@ -3,7 +3,7 @@ import shutil
 import zipfile
 
 from pathlib import Path
-from .validators import BlenderAddonValidator
+from ..validators import BlenderAddonValidator
 from loguru import logger
 
 

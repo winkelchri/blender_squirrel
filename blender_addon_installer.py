@@ -4,7 +4,7 @@ from loguru import logger
 
 from utils.settings import AddonInstallerSettings
 from utils.addons import ZipAddon
-from utils.addons.validators import InvalidBlenderAddon
+from utils.validators import InvalidBlenderAddon
 
 
 @click.group()

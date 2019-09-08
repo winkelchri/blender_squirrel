@@ -1,7 +1,7 @@
 import pytest
 from jsonschema.exceptions import ValidationError
 
-from utils.settings.validators import YAMLSettingsValidator
+from utils.validators import YAMLSettingsValidator
 
 from pathlib import Path
 

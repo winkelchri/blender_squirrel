@@ -30,4 +30,3 @@ class YAMLSettingsValidator():
                 )
 
         return settings_yaml_data
-

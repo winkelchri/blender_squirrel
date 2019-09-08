@@ -2,7 +2,7 @@ from pathlib import Path
 from loguru import logger
 import yaml
 
-from .validators import YAMLSettingsValidator
+from ..validators import YAMLSettingsValidator
 
 
 class YAMLSettings():
