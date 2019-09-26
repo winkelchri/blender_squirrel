@@ -8,7 +8,7 @@ from lxml import html
 from bs4 import BeautifulSoup
 
 
-class GumroadProducts():
+class GumroadProductsManager():
     ''' Manager class for handling gumroad addons. '''
 
     def __init__(self, url='https://gumroad.com/library'):
@@ -60,6 +60,8 @@ class GumroadProducts():
         if self.session is None:
             self.login()
 
+        logger.debug("Using existing browser session")
+
         library_response = requests.get(self.url, cookies=self.cookiejar)
         library_tree = html.fromstring(library_response.content)
 
@@ -73,7 +75,8 @@ class GumroadProducts():
         # Fill the products list with informations
         for library_product in library_products:
             # Gumroad Product Name
-            product_name = library_product.xpath("*//h1[@itemprop='name']/strong/text()")[0]
+            product_name = library_product.xpath(
+                "*//h1[@itemprop='name']/strong/text()")[0]
             # logger.debug("product_name: " + product_name)
 
             # Gumroad Product URL
@@ -81,7 +84,8 @@ class GumroadProducts():
             product_url = f'https://gumroad.com/library/purchases/{data_id}'
             # logger.debug("product_url: " + product_url)
 
-            product_object = GumroadProduct(name=product_name, url=product_url, products_manager=self)
+            product_object = GumroadProduct(
+                name=product_name, url=product_url, products_manager=self)
             product_object.html_element = library_product
 
             products.append(product_object)
@@ -89,10 +93,12 @@ class GumroadProducts():
         return products
 
     def __repr__(self):
-        return f"GumroadProducts(url={self.url})"
+        return f"GumroadProductsManager(url={self.url})"
 
 
 class GumroadProduct():
+    ''' Class for the actual gumroad product. '''
+
     def __init__(self, name, url, products_manager):
         self.name = name
         self.url = url
@@ -119,20 +125,23 @@ class GumroadProduct():
         # Product download link
         download_site_url = product_tree.xpath(
             "*//a[contains(@class, 'download')]")[0].attrib['href']
-        logger.info(f"Listing download links for '{self.name}': {download_site_url}")
+        logger.info(
+            f"Listing download links for '{self.name}': {download_site_url}")
 
         # Download link content
         download_site = requests.get(download_site_url, cookies=self.cookiejar)
         download_site_tree = html.fromstring(download_site.content)
 
-        download_link_rows = download_site_tree.xpath("//li[contains(@class, 'file-row-container')]")
+        download_link_rows = download_site_tree.xpath(
+            "//li[contains(@class, 'file-row-container')]")
         # logger.debug(download_link_rows)
 
         for row in download_link_rows:
 
             # LINK TEXT
             # $x("//div[contains(@class, 'file-row-left')]/span/text()");
-            link_text = row.xpath("*//div[contains(@class, 'file-row-left')]/span/text()")[0]
+            link_text = row.xpath(
+                "*//div[contains(@class, 'file-row-left')]/span/text()")[0]
             logger.debug(f"link_text: {link_text}")
 
             # LINK URL
@@ -158,8 +167,6 @@ class GumroadProduct():
 
             # ... the actual link should be in the header of the response:
             # logger.debug(f"actual download link: {actual_download_link}")
-
-
 
         # class = "product library-product relative js-product"
 

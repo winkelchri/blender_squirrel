@@ -2,7 +2,7 @@ import pytest
 import shutil
 import pathlib
 
-from utils.addon_sources.gumroad import GumroadProducts
+from utils.addon_sources.gumroad import GumroadProductsManager
 
 
 @pytest.fixture
@@ -16,7 +16,7 @@ def download_folder():
 
 @pytest.fixture(scope='module')
 def gumroad_addons():
-    products_manager = GumroadProducts()
+    products_manager = GumroadProductsManager()
     yield products_manager
 
 
