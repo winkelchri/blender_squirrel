@@ -143,7 +143,7 @@ class GumroadProduct():
             logger.warning(f'{download_site_url} is already a ZIP file')
             return
 
-        download_site_tree = html.fromstring(await download_site_response.text())
+        download_site_tree = html.fromstring(await download_site_response.read())
 
         download_link_rows = download_site_tree.xpath("//li[contains(@class, 'file-row-container')]")
         # logger.debug(download_link_rows)
