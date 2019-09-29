@@ -1,69 +1,66 @@
-from loguru import logger
-import webbrowser
-import browser_cookie3
-import requests
+import asyncio
 import pathlib
 
-from lxml import html
+import aiohttp
+
+import requests
+
 from bs4 import BeautifulSoup
+from loguru import logger
+from lxml import html
+
+from utils.addon_sources.website import WebsiteSource
 
 
-class GumroadProductsManager():
+class GumroadProducts():
     ''' Manager class for handling gumroad addons. '''
 
-    def __init__(self, url='https://gumroad.com/library'):
+    def __init__(self, url='https://gumroad.com/library', session_cookie_domain='gumroad.com'):
         self.url = url
-        self.__cookiejar = None
-        self.__session = None
         self.__products_list = []
-
-    @property
-    def cookiejar(self):
-        if self.__cookiejar is None:
-            self.__cookiejar = browser_cookie3.load()
-        return self.__cookiejar
-
-    @property
-    def session(self):
-        if self.__session is None:
-            for cookie in self.cookiejar:
-
-                if cookie.name == '_gumroad_guid':
-                    self.__session = cookie.value
-                    logger.info(self.__session)
-
-        return self.__session
-
-    def login(self):
-        logger.info('Open browser for login into gumroad')
-
-        webbrowser.open(self.url)
-
-        while True:
-            if self.session is None:
-                return
+        self.event_loop = asyncio.get_event_loop()
+        self.website_source = WebsiteSource(
+            session_cookie_domain=session_cookie_domain,
+            login_url=url
+        )
+        self.aiohttp_session = None
 
     def list(self, force_reload=False):
         ''' Wrapper for listing products to cache its content '''
 
         if self.__products_list == [] or force_reload is True:
-            self.__products_list = self.__list_products()
+            # Use one event loop
+            loop = self.event_loop
+
+            # Run the async function and list all products
+            self.__products_list = loop.run_until_complete(
+                self.__list_products()
+            )
+
         return self.__products_list
 
-    def __list_products(self):
+    async def __list_products(self):
         ''' Lists all available gumroad products. '''
 
         logger.info("Loading gumroad products")
         products = []
+        library_tree_url = self.url
+        aiohttp_cookies = self.website_source.aiohttp_session_cookies
+
+        # Create an aiohttp_session with required cookies. Don't forget to close later.
+        self.aiohttp_session = aiohttp.ClientSession(cookies=aiohttp_cookies)
 
         # Check if there is an existing gumroad session to use.
-        if self.session is None:
-            self.login()
+        if self.website_source.session_cookies is None:
+            self.website_source.login()
 
         logger.debug("Using existing browser session")
 
-        library_response = requests.get(self.url, cookies=self.cookiejar)
-        library_tree = html.fromstring(library_response.content)
+        if len(aiohttp_cookies) == 0:
+            raise NotImplementedError('No session cookies found. Login not successfull?')
+
+        library_html_response = await self.aiohttp_session.get(library_tree_url)
+        library_tree = html.fromstring(await library_html_response.text())
 
         # Extract all library product elements (and filter out the parent library-products element)
         library_products = [
@@ -90,6 +87,11 @@ class GumroadProductsManager():
 
             products.append(product_object)
 
+        # Prefetch download links
+        # Gather is required for ... reasons. Otherwise everything will be executed in sequence (syncron).
+        await asyncio.gather(*(product._fetch_download_links() for product in products))
+
+        await self.aiohttp_session.close()
         return products
 
     def __repr__(self):
@@ -104,6 +106,8 @@ class GumroadProduct():
         self.url = url
         self.products_manager = products_manager
         self.html_element = None
+        self.event_loop = products_manager.event_loop
+        self.__download_links = None
 
     @property
     def cookiejar(self):
@@ -113,27 +117,35 @@ class GumroadProduct():
     def download_links(self):
         ''' Returns the download links of the given product url. '''
 
-        links = []
+        if self.__download_links is None:
+            pass
 
-        if self.products_manager.session is None:
-            self.products_manager.login()
+        return self.__download_links
+
+    async def _fetch_download_links(self):
+        ''' Async function to get all download links. '''
+
+        aiohttp_session = self.products_manager.aiohttp_session
 
         # New request towards the product url to receive the download link
-        product_url_response = requests.get(self.url, cookies=self.cookiejar)
-        product_tree = html.fromstring(product_url_response.content)
+        product_url_response = await aiohttp_session.get(self.url)
+        product_tree = html.fromstring(await product_url_response.text())
 
         # Product download link
-        download_site_url = product_tree.xpath(
-            "*//a[contains(@class, 'download')]")[0].attrib['href']
-        logger.info(
-            f"Listing download links for '{self.name}': {download_site_url}")
+        download_site_url = product_tree.xpath("*//a[contains(@class, 'download')]")[0].attrib['href']
+        logger.info(f"Listing download links for '{self.name}': {download_site_url}")
 
         # Download link content
-        download_site = requests.get(download_site_url, cookies=self.cookiejar)
-        download_site_tree = html.fromstring(download_site.content)
+        download_site_response = await aiohttp_session.get(download_site_url)
 
-        download_link_rows = download_site_tree.xpath(
-            "//li[contains(@class, 'file-row-container')]")
+        # Some links already returning a ZIP file instead of a download page
+        if download_site_response.content_type == 'application/zip':
+            logger.warning(f'{download_site_url} is already a ZIP file')
+            return
+
+        download_site_tree = html.fromstring(await download_site_response.text())
+
+        download_link_rows = download_site_tree.xpath("//li[contains(@class, 'file-row-container')]")
         # logger.debug(download_link_rows)
 
         for row in download_link_rows:
@@ -155,7 +167,7 @@ class GumroadProduct():
             logger.debug(f"link_request_url: {link_request_url} ")
 
             # ... and make a request to this url ...
-            head = requests.head(link_request_url, allow_redirects=True)
+            head = await aiohttp_session.head(link_request_url, allow_redirects=True)
             logger.debug(head.headers)
             # download_link_response = requests.get(link_request_url, cookies=self.cookiejar)
 
