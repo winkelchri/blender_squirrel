@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from loguru import logger
 from lxml import html
 
-from utils.addon_sources.website import WebsiteSource
+from lib.addon_sources.website import WebsiteSource
 
 
 class GumroadProducts():

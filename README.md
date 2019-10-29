@@ -3,7 +3,7 @@
 ## Mockup
 
 ```Python
-from utils.settings import BlenderAddonSettings
+from lib.settings import BlenderAddonSettings
 
 downloaded_addons = BlenderAddonSettings.find_downloaded_addons()
 

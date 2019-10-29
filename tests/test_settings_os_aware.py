@@ -3,7 +3,7 @@ from loguru import logger
 
 from pathlib import Path
 
-from utils.settings import AddonInstallerSettings
+from lib.settings import AddonInstallerSettings
 from fixtures import valid_addons
 from fixtures import zip_file
 

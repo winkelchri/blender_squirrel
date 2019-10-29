@@ -1,8 +1,8 @@
 import pytest
 
 from pathlib import Path
-from utils.addons import ZipAddon
-from utils.validators import BlenderAddonValidator, InvalidBlenderAddon
+from lib.addons import ZipAddon
+from lib.validators import BlenderAddonValidator, InvalidBlenderAddon
 
 from fixtures import zip_file, valid_addons, invalid_addons
 

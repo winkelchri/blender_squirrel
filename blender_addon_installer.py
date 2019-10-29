@@ -2,9 +2,9 @@ import click
 
 from loguru import logger
 
-from utils.settings import AddonInstallerSettings
-from utils.addons import ZipAddon
-from utils.validators import InvalidBlenderAddon
+from lib.settings import AddonInstallerSettings
+from lib.addons import ZipAddon
+from lib.validators import InvalidBlenderAddon
 
 
 @click.group()

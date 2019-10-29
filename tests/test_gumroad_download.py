@@ -2,7 +2,7 @@ import pytest
 import shutil
 import pathlib
 
-from utils.addon_sources.gumroad import GumroadProducts
+from lib.addon_sources.gumroad import GumroadProducts
 
 
 @pytest.fixture
