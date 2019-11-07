@@ -7,4 +7,4 @@ test:
   script:
   - pip install poetry
   - poetry install
-  - poetry run python -m pytest
+  - poetry run python -m pytest --disable-warnings

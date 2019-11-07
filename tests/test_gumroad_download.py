@@ -1,3 +1,4 @@
+import sys
 import pytest
 import shutil
 import pathlib
@@ -20,10 +21,12 @@ def gumroad_addons():
     yield products_manager
 
 
+@pytest.mark.skipif(not sys.platform.startswith("win"), reason="currently only works on windows")
 def test_gumroad_listing(gumroad_addons):
     assert len(gumroad_addons.list()) > 0
 
 
+@pytest.mark.skipif(not sys.platform.startswith("win"), reason="currently only works on windows")
 def test_gumroad_product_download_links(gumroad_addons):
     product_list = gumroad_addons.list()
     print(product_list)

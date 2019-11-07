@@ -17,6 +17,10 @@ class WebsiteSource():
             session_cookie_domain (str): Name of the domain the cookies are stored for.
         '''
 
+        # FIXME: It might be possible, that a session was found but not useable.
+        #        Unfortunately no errors captured last time and after new login
+        #        the plugin worked again.
+
         self.login_url = login_url
         self.session_cookie_domain = session_cookie_domain
         self.__host_cookiejar = None
@@ -77,7 +81,6 @@ class WebsiteSource():
         simplecookie[cookie.name]["path"] = cookie.path
         simplecookie[cookie.name]["expires"] = str(cookie.expires)
         simplecookie[cookie.name]["domain"] = str(cookie.domain)
-
         return simplecookie
 
     def login(self):

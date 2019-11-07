@@ -8,8 +8,18 @@ import ast
 
 class BlenderAddon():
     def __init__(self, addon_path):
-        self.addon_path = Path(addon_path)
+        self.__addon_path = Path(addon_path)
         self.__bl_info = None
+
+    @property
+    def addon_path(self):
+        if not isinstance(self.__addon_path, Path):
+            self.__addon_path = Path(self.__addon_path)
+        return self.__addon_path
+
+    @addon_path.setter
+    def addon_path(self, value):
+        self.__addon_path = Path(value)
 
     @property
     def bl_info(self):
