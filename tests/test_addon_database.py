@@ -3,8 +3,8 @@ import pytest
 
 import tempfile
 from pathlib import Path
-from lib.addons.database import LocalAddonsDatabase
-from lib.addons.blender_addon import BlenderAddon
+from squirrel.addons.database import LocalAddonsDatabase
+from squirrel.addons.blender_addon import BlenderAddon
 
 
 @pytest.fixture

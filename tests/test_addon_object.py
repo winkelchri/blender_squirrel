@@ -2,8 +2,8 @@ import pytest
 
 import tempfile
 from fixtures import valid_addons, invalid_addons
-from lib.addons.blender_addon import BlenderAddon
-from lib.validators import InvalidBlenderAddon
+from squirrel.addons.blender_addon import BlenderAddon
+from squirrel.validators import InvalidBlenderAddon
 
 
 @pytest.fixture

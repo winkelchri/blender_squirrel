@@ -1,4 +1,4 @@
-name: Blender Addon Installer
+name: Blender Squirrel | Test
 on: [push]
 
 jobs:

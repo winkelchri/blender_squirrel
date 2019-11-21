@@ -4,8 +4,8 @@ import zipfile
 
 from pathlib import Path
 
-from lib.settings import AddonInstallerSettings
-from lib.addons import ZipAddon
+from squirrel.settings import AddonInstallerSettings
+from squirrel.addons import ZipAddon
 
 from fixtures import zip_file, valid_addons, invalid_addons
 

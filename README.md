@@ -1,9 +1,9 @@
-# Blender Addon Installer
+# Blender Squirrel - A blender addons manager
 
 ## Mockup
 
 ```Python
-from lib.settings import BlenderAddonSettings
+from squirrel.settings import BlenderAddonSettings
 
 downloaded_addons = BlenderAddonSettings.find_downloaded_addons()
 
