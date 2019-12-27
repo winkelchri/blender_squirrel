@@ -1,4 +1,5 @@
 from pathlib import Path
+import packaging
 
 from loguru import logger
 
@@ -8,18 +9,22 @@ import ast
 
 class BlenderAddon():
     def __init__(self, addon_path):
-        self.__addon_path = Path(addon_path)
+        self.__addon_path = self.__to_absolute_path(addon_path)
         self.__bl_info = None
+
+    def __to_absolute_path(self, path):
+        return Path(path).resolve()
 
     @property
     def addon_path(self):
         if not isinstance(self.__addon_path, Path):
-            self.__addon_path = Path(self.__addon_path)
+            self.__addon_path = self.__to_absolute_path(self.__addon_path)
         return self.__addon_path
 
     @addon_path.setter
     def addon_path(self, value):
-        self.__addon_path = Path(value)
+        logger.debug(f"Storing new value into addon_path: {value}")
+        self.__addon_path = self.__to_absolute_path(value)
 
     @property
     def bl_info(self):
@@ -31,7 +36,12 @@ class BlenderAddon():
 
     @property
     def version(self):
-        return self.bl_info['version']
+        ''' Returns a compareable packaging.Version object. '''
+
+        version = self.bl_info['version']
+        version_string = '.'.join(map(str, version))
+        packaging_version = packaging.version.parse(version_string)
+        return packaging_version
 
     @property
     def author(self):

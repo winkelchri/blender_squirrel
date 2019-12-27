@@ -7,13 +7,20 @@ from squirrel.addons.database import LocalAddonsDatabase
 from squirrel.addons.blender_addon import BlenderAddon
 
 
-@pytest.fixture
+@pytest.fixture()
 def database():
-    with tempfile.TemporaryDirectory() as temp_dir:
-        db_file = Path(temp_dir, 'db.json')
-        addon_database = LocalAddonsDatabase(db_file)
-        yield addon_database
-        addon_database.close()
+    ''' Creates a local test database. '''
+    db_location = Path('temp')
+    db_file = Path(db_location, 'db.sqlite')
+
+    if not db_location.exists():
+        db_location.mkdir()
+
+    addon_database = LocalAddonsDatabase(db_file, disable_pooling=True)
+    addon_database.drop()
+    yield addon_database
+    addon_database.drop()
+    addon_database.close()
 
 
 @pytest.fixture
@@ -33,16 +40,37 @@ def test_delete(database, addon):
     test_create(database, addon)
 
     database.delete(addon)
-    assert database.db.all() == []
+    assert list(database.addons_table.all()) == []
 
 
 def test_update(database, addon):
+    # Initially add the addon with the default path
     test_create(database, addon)
-    print(addon)
-    addon.addon_path = "."
 
+    # Modify the addon location
+    # Must be the absolute (to be compared against later), in because the blender
+    # BlenderAddon object will only always resolve the path.
+    new_addon_location = Path('.').resolve()
+    addon.addon_path = new_addon_location
+
+    # Update (double add == update) the addon data
     database.add(addon)
-    entry = database.get(addon)
-    print(entry)
+    entry = database.get(addon.name)
+
+    # There should still only be one addon stored into the database (updated)
+    assert len(list(database.addons_table.all())) == 1
+
+    # And the query should return the updated path from the database
+    assert entry['path'] == new_addon_location
 
 
+def test_get(database, addon):
+    test_create(database, addon)
+
+    result = database.get(addon.name)
+
+    assert result['path'] == addon.addon_path
+    assert result['version'] == addon.version
+    assert result['author'] == addon.author
+    assert result['name'] == addon.name
+    assert result['description'] == addon.description
