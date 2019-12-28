@@ -11,47 +11,69 @@ https://github.com/orsinium/poetry-setup
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
 from os import path
+from pathlib import Path
 # io.open is needed for projects that support Python 2.7
 # It ensures open() defaults to text mode with universal newlines,
 # and accepts an argument to specify the text encoding
 # Python 3 only projects can skip this import
 from io import open
-here = path.abspath(path.dirname(__file__))
+
+# Variables being used within setup()
+package_name = 'squirrel'
+description = "Blender Squirrel - A addons manager for blender"
+long_description = description
+version = '0.1a0'
+author = "Christopher Winkelmann"
+author_email = "winkelchri@gmail.com"
+install_requires = []
+
 # Get the long description from the README file
-with open(path.join(here, ''), encoding='utf-8') as f:
-    long_description = f.read()
+readme_file = Path(__file__).parent / 'README.md'
+
+if readme_file.exists():
+    with readme_file.open('r', encoding='utf-8') as fh:
+        long_description = fh.read()
+
+
+# Get the install requirements from the requirements.txt
+requirements_file = Path(__file__).parent / 'requirements.txt'
+if requirements_file.exists():
+    with requirements_file.open('r', encoding='utf-8') as fh:
+        for line in fh:
+            install_requires.append(line.strip())
+
 # Arguments marked as "Required" below must be included for upload to PyPI.
 # Fields marked as "Optional" may be commented out.
 setup(
     # https://packaging.python.org/specifications/core-metadata/#name
-    name='squirrel',  # Required
+    name=package_name,  # Required
     # https://www.python.org/dev/peps/pep-0440/
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.1a0',  # Required
+    version=version,
     # https://packaging.python.org/specifications/core-metadata/#summary
-    description="Blender Squirrel - A addons manager for blender",  # Required
+    description=description,
     # https://packaging.python.org/specifications/core-metadata/#description-optional
     long_description=long_description,  # Optional
     # https://packaging.python.org/specifications/core-metadata/#description-content-type-optional
     long_description_content_type='text/markdown',  # Optional (see note above)
-    author="Christopher Winkelmann",  # Optional
-    author_email="winkelchri@gmail.com",  # Optional
+    author=author,
+    author_email=author_email,
     # For a list of valid classifiers, see https://pypi.org/classifiers/
     classifiers=['Programming Language :: Python :: 3'],  # Optional
     packages=find_packages(),  # Required
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=[
-        'click (>=7.0,<8.0)',
-        'pyyaml (>=5.1,<6.0)',
-        'loguru (>=0.3.2,<0.4.0)',
-        'jsonschema (>=3.0,<4.0)',
-        'browser_cookie3 (>=0.7.6,<0.8.0)',
-        'requests (>=2.22,<3.0)',
-        'beautifulsoup4 (>=4.8,<5.0)',
-        'requests-html (>=0.10.0,<0.11.0)',
-        'aiohttp (>=3.6,<4.0)',
-        'tinydb (>=3.15,<4.0)',
-    ],  # Optional
+    # install_requires=[
+    #     'click (>=7.0,<8.0)',
+    #     'pyyaml (>=5.1,<6.0)',
+    #     'loguru (>=0.3.2,<0.4.0)',
+    #     'jsonschema (>=3.0,<4.0)',
+    #     'browser_cookie3 (>=0.7.6,<0.8.0)',
+    #     'requests (>=2.22,<3.0)',
+    #     'beautifulsoup4 (>=4.8,<5.0)',
+    #     'requests-html (>=0.10.0,<0.11.0)',
+    #     'aiohttp (>=3.6,<4.0)',
+    #     'tinydb (>=3.15,<4.0)',
+    # ],  # Optional
     # https://setuptools.readthedocs.io/en/latest/setuptools.html#dependencies-that-aren-t-in-pypi
     dependency_links=[],  # Optional
     # https://stackoverflow.com/a/16576850
