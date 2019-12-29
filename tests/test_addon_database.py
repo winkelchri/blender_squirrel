@@ -4,7 +4,11 @@ import pytest
 import tempfile
 from pathlib import Path
 from squirrel.addons.database import LocalAddonsDatabase
+
 from squirrel.addons.blender_addon import BlenderAddon
+from squirrel.addons.zip_addon import ZipAddon
+
+from fixtures import zip_file, valid_addons, invalid_addons
 
 
 @pytest.fixture()
@@ -74,3 +78,16 @@ def test_get(database, addon):
     assert result['author'] == addon.author
     assert result['name'] == addon.name
     assert result['description'] == addon.description
+
+
+@pytest.mark.parametrize('file_or_folder', valid_addons)
+def test_store_zip_addons(database, zip_file):
+    zip_addon = ZipAddon(addon_filename=zip_file, settings=None)
+    addon_path = zip_addon.unzip()
+    blender_addon = BlenderAddon(addon_path)
+
+    test_create(database, blender_addon)
+
+    del blender_addon
+    del zip_addon
+

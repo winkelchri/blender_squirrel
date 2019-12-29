@@ -2,6 +2,7 @@ import os
 import shutil
 import zipfile
 
+import tempfile
 from pathlib import Path
 from ..validators import BlenderAddonValidator
 from loguru import logger
@@ -13,10 +14,17 @@ class ZipAddon():
 
     def __init__(self, addon_filename, settings):
         self.__addon_filename = Path(addon_filename)
+
+        # FIXME: Dependency on AddonInstallerSettings
         self.settings = settings
 
         self.__zip_object = None
         self.__addon_path = None
+        self.__temp_folder = None
+
+    def __del__(self):
+        logger.debug(f'Cleaning up temp folder "{self.temp_folder}"')
+        shutil.rmtree(self.temp_folder, ignore_errors=True)
 
     @property
     def addon_path(self):
@@ -26,16 +34,24 @@ class ZipAddon():
     def addon_filename(self):
         return self.__addon_filename
 
-    def unzip(self, addon):
+    @property
+    def temp_folder(self):
+        ''' Creates / returns a temp folder. Needed for unpacking and cleanup afterwards. '''
+
+        if self.__temp_folder is None:
+            self.__temp_folder = Path(tempfile.mkdtemp())
+
+        return self.__temp_folder
+
+    def unzip(self):
         ''' Extracts the addon into a temp folder. '''
-        tmp_folder = self.settings.temp_folder
-        logger.info(f'Unpack {addon} into {tmp_folder}')
+        logger.info(f'Unpack {self.addon_filename} into {self.temp_folder}')
 
         # Unpack content into tmp folder
         zip_file = zipfile.ZipFile(self.addon_filename)
-        zip_file.extractall(tmp_folder)
+        zip_file.extractall(self.temp_folder)
 
-        return tmp_folder
+        return self.temp_folder
 
     def install(self):
         ''' Unpacks a zip addon. '''
@@ -43,7 +59,7 @@ class ZipAddon():
         self.validate()
 
         logger.info(f'Starting installation of {self.addon_filename}')
-        tmp_folder = self.unzip(self.addon_filename)
+        tmp_folder = self.unzip()
 
         # Get extracted addon folder name
         addon_folders = [
