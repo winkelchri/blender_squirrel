@@ -70,7 +70,11 @@ class WebsiteSource():
         '''
 
         if self.__host_cookiejar is None:
-            self.__host_cookiejar = browser_cookie3.load()
+            # FIXME: Currently, receiving cookies from chrome does not seem to work
+            # Workaround because I use firefox anyways atm.
+            # TODO: Find a better solution in general for the login handling.
+            self.__host_cookiejar = browser_cookie3.firefox()
+
         return self.__host_cookiejar
 
     def cookiejar_cookie_to_simplecookie(self, cookie):

@@ -17,7 +17,7 @@ def download_folder():
 
 @pytest.fixture(scope='module')
 def gumroad_addons():
-    products_manager = GumroadProducts()
+    products_manager = GumroadProducts(debug_html_requests=True)
     yield products_manager
 
 
@@ -30,5 +30,7 @@ def test_gumroad_listing(gumroad_addons):
 def test_gumroad_product_download_links(gumroad_addons):
     product_list = gumroad_addons.list()
     print(product_list)
+    assert len(product_list) > 0
+
     product = product_list[0]
     print(product.download_links)

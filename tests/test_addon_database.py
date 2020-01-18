@@ -90,4 +90,3 @@ def test_store_zip_addons(database, zip_file):
 
     del blender_addon
     del zip_addon
-
