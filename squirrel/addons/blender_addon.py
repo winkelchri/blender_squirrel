@@ -8,6 +8,12 @@ import ast
 
 
 class BlenderAddon():
+
+    __slots__ = (
+        '__addon_path',
+        '__bl_info',
+    )
+
     def __init__(self, addon_path):
         self.__addon_path = self.__to_absolute_path(addon_path)
         self.__bl_info = None

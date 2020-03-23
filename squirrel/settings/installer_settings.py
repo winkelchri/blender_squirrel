@@ -11,6 +11,17 @@ from .loaders import YAMLSettings
 
 
 class AddonInstallerSettings():
+
+    __slots__ = (
+        'system',
+        'settings_file',
+        'blender_version',
+        '__settings',
+        '__temp_dir',
+        '__addon_path',
+        '__backup_path',
+    )
+
     def __init__(self, settings_file=None, blender_version="2.80"):
         self.system = platform.system()
         self.settings_file = settings_file
