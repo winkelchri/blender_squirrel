@@ -94,7 +94,7 @@ class ZipAddon():
         # Install the addon into the blender addons path
         addon_install_path = self.settings.addon_path / addon.name
         logger.info(f"Move {addon} to {addon_install_path}.")
-        shutil.move(addon, addon_install_path)
+        shutil.move(addon.as_posix(), addon_install_path.as_posix())
 
         self.__addon_path = Path(addon_install_path, addon)
 
