@@ -10,22 +10,22 @@ from squirrel.addons import ZipAddon
 from fixtures import zip_file, valid_addons, invalid_addons
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def settings():
     return AddonInstallerSettings()
 
 
-@pytest.fixture
-def test_addon_path():
-    path = Path('./blender_test_addon_path/')
+@pytest.fixture(scope="module")
+def test_addon_install_path():
+    path = Path('./blender_test_addon_install_path/')
     path.mkdir(exist_ok=True, parents=True)
     yield path
     shutil.rmtree(path, ignore_errors=True)
 
 
-@pytest.fixture
-def addon_backup_path():
-    path = Path('./addon_backup_path')
+@pytest.fixture(scope="module")
+def test_addon_backup_path():
+    path = Path('./blender_addon_install_backup_path')
     yield path
     shutil.rmtree(path, ignore_errors=True)
 
@@ -50,14 +50,14 @@ def validate_addon_content(addon, target_directory):
 def test_install_valid_addons(
     settings,
     zip_file,
-    test_addon_path,
-    addon_backup_path,
+    test_addon_install_path,
+    test_addon_backup_path,
 ):
 
-    settings.addon_path = test_addon_path
-    settings.backup_path = addon_backup_path
+    settings.addon_path = test_addon_install_path
+    settings.backup_path = test_addon_backup_path
     addon = ZipAddon(addon_filename=zip_file, settings=settings)
     addon.install()
 
     # TODO: Do actual addon content validation.
-    validate_addon_content(addon, test_addon_path)
+    validate_addon_content(addon, test_addon_install_path)
