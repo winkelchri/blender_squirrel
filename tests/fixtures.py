@@ -5,37 +5,73 @@ import pathlib
 
 
 @pytest.fixture
-def file_or_folder():
+def target():
     return "./tests/test_files/addon_valid_single"
 
 
 @pytest.fixture
-def zip_file(file_or_folder):
+def targets():
+    return ()
+
+
+def create_zip_file(target):
+    ''' `target` shall either be a file or a folder. '''
+
+    temp_dir = tempfile.TemporaryDirectory()
+
+    # Use pathlib path's
+    temp_path = pathlib.Path(temp_dir.name)
+    target = pathlib.Path(target)
+
+    # Create the target file (excluding extension)
+    base_name = temp_path / target.name
+
+    # Create the archive and return it's name
+    target = shutil.make_archive(
+        base_name=base_name,
+        format="zip",
+        root_dir=target
+    )
+
+    return (pathlib.Path(target), temp_dir)
+
+
+@pytest.fixture
+def zip_file(target):
     ''' Creates a zip file of the given folder or file within a temp folder
         and return its filename.
 
         Deletes the temp zip file afterwards.
+
+        Usage:
+            Use this fixture in the test as a parameter.
+            Add the `@pytest.mark.parametrize('target', list_of_files)`
+            decorator as a test.
+
+        Example:
+            @pytest.mark.parametrize('target', list_of_files)
+            def my_test(zip_file):
+                # Will be a single zip file of the list_of_files list
+                print(zip_file)
     '''
 
-    with tempfile.TemporaryDirectory() as temp_dir:
-        # Use pathlib path's
-        temp_dir = pathlib.Path(temp_dir)
-        file_or_folder = pathlib.Path(file_or_folder)
+    target_zip, temp_dir = create_zip_file(target)
+    yield target_zip
+    temp_dir.cleanup()
+    # Everything will be deleted now ...
 
-        # Create the target file (excluding extension)
-        base_name = temp_dir / file_or_folder.name
 
-        # Create the archive and return it's name
-        target = shutil.make_archive(
-            base_name=base_name,
-            format="zip",
-            root_dir=file_or_folder
-        )
+@pytest.fixture
+def zip_files(targets):
 
-        output = pathlib.Path(target)
-        yield output
+    zipped_targets = list(map(create_zip_file, targets))
+    zip_files = [item[0] for item in zipped_targets]
+    temp_dirs = [item[1] for item in zipped_targets]
 
-        # Everything will be deleted now ...
+    yield zip_files
+
+    for temp_dir in temp_dirs:
+        temp_dir.cleanup()
 
 
 valid_addons = [
