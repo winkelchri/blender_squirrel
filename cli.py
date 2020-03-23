@@ -7,6 +7,10 @@ from squirrel.addons import ZipAddon
 from squirrel.validators import InvalidBlenderAddon
 
 
+SETTINGS = AddonInstallerSettings()
+ADDON_PATHS = SETTINGS.find_downloaded_addons()
+
+
 @click.group()
 def cli():
     pass
@@ -14,17 +18,24 @@ def cli():
 
 @cli.command()
 @click.option('--cleanup', is_flag=True, help="Removes the installed file from the source directory")
-def install(cleanup):
-    settings = AddonInstallerSettings()
-    addons_paths = settings.find_downloaded_addons()
+@click.option('-v', '--verbose', count=True)
+def install(cleanup, verbose):
+    ''' Installs manually downloaded addons. '''
+
     skipped_files = []
     cleaned_files = []
 
-    for addon_path in addons_paths:
+    if verbose:
+        logger.level('DEBUG')
+    else:
+        logger.level('WARNING')
+
+    for addon_path in ADDON_PATHS:
         addon = ZipAddon(
-            settings=settings,
+            settings=SETTINGS,
             addon_filename=addon_path
         )
+
         try:
             addon.install()
             if cleanup is True:
@@ -45,6 +56,14 @@ def install(cleanup):
         click.echo(f"Cleaned: ")
         for file in cleaned_files:
             click.echo(f"- {file}")
+
+
+@cli.command()
+@click.option('-v', '--verbose', count=True)
+def index(verbose):
+    ''' Creates/Updates local blender addon database. '''
+
+    click.echo("Indexing current blender addons ...")
 
 
 if __name__ == "__main__":
